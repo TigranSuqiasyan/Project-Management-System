@@ -49,17 +49,35 @@ private:
 
 class Project{
 public:
-    Project();
     Project(const std::vector<std::string>&);
     void set_title(const std::string&);
     std::string get_title() const;
+    std::vector<Task> get_tasks() const;
     void add_task(const Task&);
     void remove_task(unsigned);
     void sort_tasks();
+    std::vector<std::string> to_strings() const;
 private:
     std::string _title;
     std::vector<Task> _tasks;
 };
+
+//std::vector<std::string> lines;
+//std::vector<Project> projects;
+
+class Manager{
+public:
+    Manager(const std::string&);
+    void from_file_to_lines() const;
+    void from_lines_to_projects() const;
+    void display() const;
+    void edit() const;
+    void from_projects_to_lines() const;
+    void from_lines_to_file() const;
+private:
+    std::string _filename;
+};
+
 
 
 #endif // PROJECT_MANAGEMENT_SYSTEM

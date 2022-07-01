@@ -1,8 +1,9 @@
 #include "project_management_system.hpp"
-
 #include <iostream>
-#include <string>
-#include <vector>
+#include <fstream>
+
+std::vector<std::string> lines;
+std::vector<Project> projects;
 
 // ---------------------------------- Date
 
@@ -16,7 +17,7 @@ Date::Date(int day, int month, int year)
 Date::Date(std::string date){
     _day = std::stoi(date.substr(0, 2));
     _month = std::stoi(date.substr(3, 2));
-    _year = std::stoi(date.substr(6, 2));
+    _year = std::stoi(date.substr(6, 4));
 }
 
 void Date::set_day(int day){
@@ -45,15 +46,16 @@ int Date::get_year() const{
 
 std::string Date::to_string() const{
     std::string result;
-    result += _day / 10;
-    result += _day % 10;
+    result += _day / 10 + '0';
+    result += _day % 10 + '0';
     result += ".";
-    result += _month / 10;
-    result += _month % 10;
-    result += _year / 1000;
-    result += (_year / 100) % 10;
-    result += (_year / 10) % 10;
-    result += _year % 10;
+    result += _month / 10 + '0';
+    result += _month % 10 + '0';
+    result += ".";
+    result += _year / 1000 + '0';
+    result += (_year / 100) % 10 + '0';
+    result += (_year / 10) % 10 + '0';
+    result += _year % 10 + '0';
     return result;
 }
 
@@ -138,9 +140,6 @@ std::string Task::to_string() const{
 
 // ----------------------------- Project
 
-Project::Project(){
-}
-
 Project::Project(const std::vector<std::string>& strings){
     if(strings[0].substr(0,8) != "project "){
         std::cout << "smth went wrong";
@@ -159,6 +158,10 @@ void Project::set_title(const std::string& title){
 
 std::string Project::get_title() const{
     return _title;
+}
+
+std::vector<Task> Project::get_tasks() const{
+    return _tasks;
 }
 
 void Project::add_task(const Task& task){
@@ -181,4 +184,131 @@ void Project::sort_tasks(){
         }
         _tasks[j + 1] = tmp;
     }
+}
+
+std::vector<std::string> Project::to_strings() const{
+    std::vector<std::string> strings;
+    strings.push_back("project " + _title);
+    int size = _tasks.size();
+    for(int i{}; i < size; ++i){
+        strings.push_back(_tasks[i].to_string());
+    }
+    return strings;
+}
+
+// ------------------------------------ Manager
+
+Manager::Manager(const std::string& filename)
+    : _filename{filename} {
+}
+
+void Manager::from_file_to_lines() const{
+    std::ifstream fin(_filename, std::ios::in);
+    std::string line;
+    if(fin.is_open()){
+        while(!fin.eof()){
+            std::getline(fin, line);
+            lines.push_back(line);
+        }
+    }
+    fin.close();
+    if(lines.size())
+        lines.pop_back();
+}
+
+void Manager::from_lines_to_projects() const{
+    projects.clear();
+    std::vector<int> indexes;
+    for(int i{}; i < lines.size(); ++i){
+        if(lines[i][0] == 'p'){
+            indexes.push_back(i);
+            //std::cout << i;
+        }
+    }
+    for(int i{}; i < indexes.size() - 1; ++i){
+        std::vector<std::string> project;
+        for(int j = indexes[i]; j < indexes[i + 1]; ++j){
+            project.push_back(lines[j]);
+        }
+        projects.push_back(Project(project));
+    }
+    std::vector<std::string> last_project;
+    for(int i = indexes.back(); i < lines.size(); ++i){
+        last_project.push_back(lines[i]);
+    }
+    projects.push_back(Project(last_project));
+}
+
+void Manager::display() const{
+    int size = projects.size();
+    for(int i{}; i < size; ++i){
+        std::cout << "project " << projects[i].get_title() << "\n";
+        std::vector<Task> tasks = projects[i].get_tasks();
+        int tasks_size = tasks.size();
+        for(int j{}; j < tasks_size; ++j){
+            if(j < 9)
+                std::cout << 0;
+            std::cout << j + 1;
+            std::cout << " | ";
+            if(tasks[j].get_description().size() < 30){
+                std::cout << tasks[j].get_description();
+                for(int i{}; i < 30 - tasks[j].get_description().size(); ++i){
+                    std::cout << ' ';
+                }
+            }
+            else{
+                for(int i{}; i < 27; ++i){
+                    std::cout << tasks[j].get_description()[i];
+                }
+                std::cout << "...";
+            }
+            std::cout << " | ";
+            //std::cout << tasks[j].get_assignee();
+            if(tasks[j].get_assignee().size() < 10){
+                std::cout << tasks[j].get_assignee();
+                for(int i{}; i < 10 - tasks[j].get_assignee().size(); ++i){
+                    std::cout << ' ';
+                }
+            }
+            else{
+                for(int i{}; i < 7; ++i){
+                    std::cout << tasks[j].get_assignee()[i];
+                }
+                std::cout << "...";
+            }
+            std::cout << " | ";
+            std::cout << tasks[j].get_deadline().to_string();
+            std::cout << " | ";
+            switch(tasks[j].get_state()){
+                case 0: std::cout << "TODO"; break;
+                case 1: std::cout << "IN_PROGRESS"; break;
+                case 2: std::cout << "IN_REVIEW"; break;
+                case 3: std::cout << "DONE"; break;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << '\n';
+    }
+}
+
+void Manager::from_projects_to_lines() const{
+    lines.clear();
+    int size = projects.size();
+    for(int i{}; i < size; ++i){
+        int project_size = projects[i].to_strings().size();
+        for(int j{}; j < project_size; ++j){
+            lines.push_back(projects[i].to_strings()[j]);
+        }
+    }
+}
+
+void Manager::from_lines_to_file() const{
+    std::ofstream fout(_filename, std::ios::out);
+    if(fout.is_open()){
+        int size = lines.size();
+        for(int i{}; i < size; ++i){
+            fout << lines[i] << std::endl;
+        }
+    }
+    fout.close();
 }

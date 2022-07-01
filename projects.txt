@@ -1,0 +1,5 @@
+project ULTRON
+01 | implement vector | Karen | 07.10.2022 | IN_REVIEW
+02 | implement hash_table | Simon | 12.12.2022 | DONE
+project MANHATTAN
+01 | do something awesome | Leonardo da Vinci | 02.12.2021 | DONE

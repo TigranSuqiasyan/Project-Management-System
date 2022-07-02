@@ -1,5 +1,9 @@
 project ULTRON
-01 | implement vector | Karen | 07.10.2022 | IN_REVIEW
-02 | implement hash_table | Simon | 12.12.2022 | DONE
+00 | implement vector | Karen | 07.10.2022 | IN_REVIEW
+00 | implement hash_table | Simon | 12.12.2022 | DONE
 project MANHATTAN
-01 | do something awesome | Leonardo da Vinci | 02.12.2021 | DONE
+00 | do something awesome | Dwight Eisenhouer | 12.03.2015 | DONE
+project BULLET
+00 | kill the enemy with one bullet | the spy | 15.11.2011 | DONE
+00 | survive | the spy | 23.11.2011 | TODO
+00 | go up th hill | the spy | 16.09.2011 | IN_PROGRESS

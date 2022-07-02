@@ -49,10 +49,11 @@ private:
 
 class Project{
 public:
+    Project();
     Project(const std::vector<std::string>&);
     void set_title(const std::string&);
     std::string get_title() const;
-    std::vector<Task> get_tasks() const;
+    std::vector<Task>& get_tasks();
     void add_task(const Task&);
     void remove_task(unsigned);
     void sort_tasks();
@@ -74,10 +75,16 @@ public:
     void edit() const;
     void from_projects_to_lines() const;
     void from_lines_to_file() const;
+    void add_project() const;
+    void edit_project(int) const;
+    void delete_project(int) const;
+    void add_task(int) const;
+    void edit_task(int, int) const;
+    void delete_task(int, int) const;
+private:
+    bool project_exists(std::string) const;
 private:
     std::string _filename;
 };
-
-
 
 #endif // PROJECT_MANAGEMENT_SYSTEM

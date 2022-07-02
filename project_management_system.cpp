@@ -140,6 +140,8 @@ std::string Task::to_string() const{
 
 // ----------------------------- Project
 
+Project::Project(){}
+
 Project::Project(const std::vector<std::string>& strings){
     if(strings[0].substr(0,8) != "project "){
         std::cout << "smth went wrong";
@@ -287,7 +289,28 @@ void Manager::display() const{
             }
             std::cout << std::endl;
         }
-        std::cout << '\n';
+        for(int i{}; i < 70; ++i){
+            std::cout << '-';
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << "[A] to add a project\n";
+    std::cout << "[E] to edit a project\n";
+    std::cout << "[D] to delete a project\n";
+    std::cout << "[S] to save and quit\n";
+
+}
+
+void Manager::edit() const{
+    char choice{};
+    std::cin >> choice;
+    switch(choice){
+        case 'A':
+        case 'E':
+        case 'D':
+        case 'S':
+        default :
     }
 }
 
@@ -311,4 +334,67 @@ void Manager::from_lines_to_file() const{
         }
     }
     fout.close();
+}
+
+void Manager::add_project() const{
+    std::string title{};
+    do{
+        std::cout << "enter project's name : ";
+        std::cin >> title;
+    }while(!this->project_exists(title));
+    Project new_project;
+    new_project.set_title(title);
+}
+
+void Manager::edit_project() const{
+    std::string title{};
+    do{
+        std::cout << "enter project's name : ";
+        std::cin >> title;
+    }while(this->project_exists(title));
+    int index{};
+    for(int i{}; i < projects.size(); ++i){
+        if(projects[i].get_title() == title)
+            index = i;
+    }
+}
+
+void Manager::add_task(int index) const{
+    Task new_task;
+    std::string temp{};
+
+    std::cout << "description : ";
+    std::cin >> temp;
+    new_task.set_description(temp);
+
+    std::cout << "assignee : ";
+    std::cin >> temp;
+    new_task.set_assignee(temp);
+
+    std::cout << "deadline : ";
+    std::cin >> temp;
+    Date deadline(temp);
+    new_task.set_deadline(deadline);
+
+    std::cout << "state : ";
+    std::cin >> temp;
+    if(temp == "TODO")
+        new_task.set_state(TODO);
+    else if(temp == "IN_PROGRESS")
+        new_task.set_state(IN_PROGRESS);
+    else if(temp == "IN_REVIEW")
+        new_task.set_state(IN_REVIEW);
+    else if(temp == "DONE")
+        new_task.set_state(DONE);
+    else
+        new_task.set_state(TODO);
+}
+
+
+
+bool Manager::project_exists(std::string title) const{
+    for(int i{}; i < projects.size(); ++i)
+        if(projects[i].get_title() == title)
+            return true;
+    return false;
 }
